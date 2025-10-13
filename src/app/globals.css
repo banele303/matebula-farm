@@ -1,26 +1,224 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px); 
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Border Radius */
+  --radius: 0.625rem;
+  
+  /* PRIMARY: Earth Tones - Browns & Soil (Dominant) */
+  --brand-brown-50: 251 247 242;     /* Lightest cream */
+  --brand-brown-100: 245 237 227;    /* Light cream - egg shell */
+  --brand-brown-200: 235 222 202;    /* Soft tan */
+  --brand-brown-300: 210 180 140;    /* Warm tan - chicken color */
+  --brand-brown-400: 165 124 85;     /* Earth brown - soil */
+  --brand-brown-500: 139 97 63;      /* Rich earth - PRIMARY BRAND ✓ */
+  --brand-brown-600: 120 79 50;      /* Deep earth */
+  --brand-brown-700: 92 64 43;       /* Dark soil */
+  --brand-brown-800: 68 47 33;       /* Very dark earth */
+  --brand-brown-900: 45 32 23;       /* Almost black earth */
+  
+  /* SECONDARY: Natural Greens - Growth & Vitality */
+  --brand-green-50: 240 249 235;     /* Very light green */
+  --brand-green-100: 220 247 220;    /* Light green - fresh produce */
+  --brand-green-200: 187 237 187;    /* Soft green */
+  --brand-green-300: 134 211 134;    /* Medium green - spinach */
+  --brand-green-400: 92 184 92;      /* Fresh green */
+  --brand-green-500: 70 158 70;      /* Natural green ✓ */
+  --brand-green-600: 56 142 60;      /* Deep green */
+  --brand-green-700: 46 125 50;      /* Forest green */
+  --brand-green-800: 35 97 38;       /* Dark foliage */
+  --brand-green-900: 27 74 30;       /* Very dark green */
+  
+  /* TERTIARY: Warm Accents - Eggs & Warmth */
+  --brand-cream-50: 255 253 250;     /* Pure white - poultry house */
+  --brand-cream-100: 254 250 244;    /* Off white */
+  --brand-cream-200: 250 242 232;    /* Light cream */
+  --brand-cream-300: 245 231 214;    /* Egg shell */
+  --brand-gold-400: 234 179 8;       /* Golden yellow - quality */
+  --brand-gold-500: 202 138 4;       /* Deep gold */
+  --brand-amber-500: 217 119 6;      /* Warm amber */
+  --brand-terracotta-500: 192 86 33; /* Terracotta clay */
+  
+  /* Base Theme Colors - Earth-Focused */
+  --background: oklch(0.99 0.008 75);          /* Warm white */
+  --foreground: oklch(0.25 0.02 55);           /* Dark brown text */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.25 0.02 55);
+  --popover: oklch(0.99 0.008 75);
+  --popover-foreground: oklch(0.25 0.02 55);
+  
+  /* Primary: Warm Earth Brown (Main Brand Color) */
+  --primary: oklch(0.48 0.08 55);              /* Rich earth brown */
+  --primary-foreground: oklch(0.99 0 0);
+  
+  /* Secondary: Natural Green */
+  --secondary: oklch(0.58 0.12 140);           /* Natural green */
+  --secondary-foreground: oklch(0.99 0 0);
+  
+  /* Muted: Soft earth tones */
+  --muted: oklch(0.96 0.01 75);                /* Light cream */
+  --muted-foreground: oklch(0.50 0.02 55);
+  
+  /* Accent: Fresh green */
+  --accent: oklch(0.63 0.14 140);              /* Fresh green accent */
+  --accent-foreground: oklch(0.99 0 0);
+  
+  /* Destructive */
+  --destructive: oklch(0.577 0.245 27.325);
+  
+  /* Borders and inputs */
+  --border: oklch(0.92 0.01 75);               /* Soft tan border */
+  --input: oklch(0.92 0.01 75);
+  --ring: oklch(0.48 0.08 55);                 /* Earth brown ring */
+  
+  /* Charts - Earthy Natural palette */
+  --chart-1: oklch(0.48 0.08 55);              /* Earth brown */
+  --chart-2: oklch(0.63 0.14 140);             /* Natural green */
+  --chart-3: oklch(0.70 0.15 75);              /* Golden */
+  --chart-4: oklch(0.55 0.10 55);              /* Deep earth */
+  --chart-5: oklch(0.60 0.12 35);              /* Terracotta */
+  
+  /* Sidebar */
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.25 0.02 55);
+  --sidebar-primary: oklch(0.48 0.08 55);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.96 0.01 75);
+  --sidebar-accent-foreground: oklch(0.25 0.02 55);
+  --sidebar-border: oklch(0.92 0.01 75);
+  --sidebar-ring: oklch(0.48 0.08 55);
+}
+
+.dark {
+  --background: oklch(0.18 0.02 55);           /* Dark earth */
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.22 0.02 55);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.22 0.02 55);
+  --popover-foreground: oklch(0.98 0 0);
+  
+  /* Primary: Lighter earth for dark mode */
+  --primary: oklch(0.65 0.10 55);
+  --primary-foreground: oklch(0.18 0.02 55);
+  
+  /* Secondary: Brighter green for dark mode */
+  --secondary: oklch(0.68 0.14 140);
+  --secondary-foreground: oklch(0.18 0.02 55);
+  
+  /* Muted */
+  --muted: oklch(0.28 0.02 55);
+  --muted-foreground: oklch(0.70 0.02 55);
+  
+  /* Accent */
+  --accent: oklch(0.68 0.14 140);
+  --accent-foreground: oklch(0.18 0.02 55);
+  
+  /* Destructive */
+  --destructive: oklch(0.704 0.191 22.216);
+  
+  /* Borders */
+  --border: oklch(0.30 0.02 55);
+  --input: oklch(0.35 0.02 55);
+  --ring: oklch(0.65 0.10 55);
+  
+  /* Charts */
+  --chart-1: oklch(0.65 0.10 55);
+  --chart-2: oklch(0.68 0.14 140);
+  --chart-3: oklch(0.75 0.15 75);
+  --chart-4: oklch(0.60 0.10 55);
+  --chart-5: oklch(0.65 0.12 35);
+  
+  /* Sidebar */
+  --sidebar: oklch(0.22 0.02 55);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.65 0.10 55);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.28 0.02 55);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.30 0.02 55);
+  --sidebar-ring: oklch(0.65 0.10 55);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  /* Custom brand utility classes - Earthy Theme */
+  .brand-gradient-brown {
+    background: linear-gradient(135deg, rgb(var(--brand-brown-600)) 0%, rgb(var(--brand-brown-500)) 100%);
+  }
+  
+  .brand-gradient-earth {
+    background: linear-gradient(135deg, rgb(var(--brand-brown-400)) 0%, rgb(var(--brand-brown-300)) 100%);
+  }
+  
+  .brand-gradient-green {
+    background: linear-gradient(135deg, rgb(var(--brand-green-600)) 0%, rgb(var(--brand-green-500)) 100%);
+  }
+  
+  .brand-text-gradient {
+    background: linear-gradient(135deg, rgb(var(--brand-brown-500)), rgb(var(--brand-green-500)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .brand-shadow-brown {
+    box-shadow: 0 10px 40px -10px rgba(139, 97, 63, 0.3);
+  }
+  
+  .brand-shadow-green {
+    box-shadow: 0 10px 40px -10px rgba(70, 158, 70, 0.3);
+  }
+  
+  .brand-glow-earth {
+    box-shadow: 0 0 20px rgba(165, 124, 85, 0.3);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
