@@ -145,23 +145,7 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <SectionTitle title="Find Us" subtitle="Located in Honingnestkrans, North of Pretoria" />
-          
-          <div className="bg-gray-200 h-96 rounded-lg flex items-center justify-center">
-            <div className="text-center text-gray-500">
-              <div className="text-4xl mb-4">🗺️</div>
-              <p className="text-lg font-semibold">Interactive Map</p>
-              <p className="text-sm">
-                Honingnestkrans, North of Pretoria<br />
-                GPS coordinates would be embedded here
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+
     </div>
   );
 }
