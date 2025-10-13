@@ -96,7 +96,7 @@ export default function Services() {
           <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
           <p className="text-xl mb-8">
             Whether you need fresh produce delivered, want to partner with us, or are interested 
-            in our Help a Farmer program - we're here to help.
+            in our Help a Farmer program - we&apos;re here to help.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link

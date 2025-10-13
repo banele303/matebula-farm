@@ -98,7 +98,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready for Farm-Fresh Quality?</h2>
           <p className="text-xl mb-8">
-            Whether you're a restaurant, retailer, or family - we deliver fresh produce straight to your door.
+            Whether you&apos;re a restaurant, retailer, or family - we deliver fresh produce straight to your door.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link href="/contact" className="bg-white text-amber-900 px-10 py-5 rounded-lg hover:bg-cream-50 transition-all font-bold text-lg shadow-lg">

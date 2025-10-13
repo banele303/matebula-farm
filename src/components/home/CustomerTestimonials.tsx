@@ -65,7 +65,7 @@ export default function CustomerTestimonials() {
                   <span key={i} className="text-yellow-400 text-xl">★</span>
                 ))}
               </div>
-              <p className="text-gray-700 italic">"{review.text}"</p>
+              <p className="text-gray-700 italic">&ldquo;{review.text}&rdquo;</p>
             </motion.div>
           ))}
         </div>

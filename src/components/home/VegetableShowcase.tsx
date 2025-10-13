@@ -127,7 +127,7 @@ export default function VegetableShowcase() {
           </div>
           <div className="text-center mt-8 pt-8 border-t">
             <p className="text-gray-600 mb-4">
-              Can't find what you're looking for? Contact us for custom orders!
+              Can&apos;t find what you&apos;re looking for? Contact us for custom orders!
             </p>
             <Link 
               href="/contact" 

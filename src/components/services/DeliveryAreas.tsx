@@ -56,7 +56,7 @@ export default function DeliveryAreas() {
               Expansion Plans
             </h3>
             <p className="text-gray-600 mb-6">
-              We're constantly working to expand our delivery network. Coming soon to these areas:
+              We&apos;re constantly working to expand our delivery network. Coming soon to these areas:
             </p>
             <div className="grid grid-cols-2 gap-4 mb-8">
               {expansionAreas.map((area, index) => (

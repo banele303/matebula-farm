@@ -86,7 +86,7 @@ export default function Partners() {
         <div className="max-w-7xl mx-auto px-4">
           <SectionTitle 
             title="Our Customers" 
-            subtitle="Restaurants and establishments we're proud to serve"
+            subtitle="Restaurants and establishments we&apos;re proud to serve"
           />
           
           <div className="grid md:grid-cols-2 gap-8">
@@ -132,7 +132,7 @@ export default function Partners() {
           
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl mx-auto">
             <p className="text-lg text-gray-700 mb-6">
-              Interested in partnering with Mathebula Farm? We're always looking for 
+              Interested in partnering with Mathebula Farm? We&apos;re always looking for 
               quality-focused businesses to join our network.
             </p>
             

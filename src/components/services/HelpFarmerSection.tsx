@@ -70,9 +70,9 @@ export default function HelpFarmerSection() {
               training, and market access they need to thrive.
             </p>
             <p className="mb-8">
-              Since launching in 2024, we've supported over 20 local farmers, providing them with 
+              Since launching in 2024, we&apos;ve supported over 20 local farmers, providing them with 
               modern farming techniques, quality inputs, and direct connections to buyers. Together, 
-              we're building a stronger, more sustainable agricultural community.
+              we&apos;re building a stronger, more sustainable agricultural community.
             </p>
             
             <div className="grid grid-cols-3 gap-4 mb-8">

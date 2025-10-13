@@ -63,7 +63,7 @@ export default function About() {
           <h1 className="text-5xl md:text-6xl font-bold mb-6">About Mathebula Farm</h1>
           <p className="text-2xl mb-4">Building sustainable farming practices with community at heart</p>
           <p className="text-lg max-w-2xl">
-            Since 2019, we've been dedicated to producing quality eggs and vegetables while creating 
+            Since 2019, we&apos;ve been dedicated to producing quality eggs and vegetables while creating 
             opportunities and supporting our community in Honingnestkrans, North of Pretoria.
           </p>
         </div>
@@ -131,7 +131,7 @@ export default function About() {
               </div>
               <h2 className="text-4xl font-bold text-gray-800 mb-4">🏆 B-BBEE Level 1 Certified</h2>
               <p className="text-lg text-gray-600 mb-6">
-                We're proud to hold B-BBEE Level 1 certification, the highest level of Broad-Based Black 
+                We&apos;re proud to hold B-BBEE Level 1 certification, the highest level of Broad-Based Black 
                 Economic Empowerment recognition in South Africa.
               </p>
               
