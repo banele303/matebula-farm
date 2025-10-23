@@ -44,10 +44,9 @@ export default function Footer() {
             </h4>
             <nav className="space-y-2.5">
               {[
-                { href: "/about", label: "About Us" },
+
                 { href: "/products", label: "Products" },
                 { href: "/services", label: "Services" },
-                { href: "/gallery", label: "Gallery" },
                 { href: "/partners", label: "Partners" },
                 { href: "/contact", label: "Contact" }
               ].map((link) => (

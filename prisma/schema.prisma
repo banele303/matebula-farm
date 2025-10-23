@@ -1,0 +1,169 @@
+// Prisma schema for Mathebula Farm storefront
+// Run `npx prisma migrate dev` after defining your DATABASE_URL env variable
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FULFILLED
+  CANCELLED
+}
+
+model User {
+  id        String    @id @default(cuid())
+  kindeId   String    @unique
+  email     String?   @unique
+  name      String?
+  image     String?
+  role      UserRole  @default(CUSTOMER)
+  cart      Cart?
+  addresses Address[]
+  orders    Order[]
+  reviews   Review[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model ProductCategory {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Product {
+  id              String          @id @default(cuid())
+  name            String
+  slug            String          @unique
+  shortDescription String?
+  description     String?
+  priceInCents    Int
+  compareAtPriceCents Int?
+  // Sale fields
+  onSale          Boolean        @default(false)
+  saleDiscountPercent Int?
+  saleEndsAt      DateTime?
+  currency        String          @default("ZAR")
+  stock           Int             @default(0)
+  unit            String?         // e.g. tray, bunch
+  isFeatured      Boolean         @default(false)
+  isActive        Boolean         @default(true)
+  categoryId      String?
+  category        ProductCategory? @relation(fields: [categoryId], references: [id])
+  images          ProductImage[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+  reviews         Review[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  altText   String?
+  position  Int      @default(0)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id             String   @id @default(cuid())
+  cartId         String
+  productId      String
+  quantity       Int      @default(1)
+  unitPriceInCents Int
+  cart           Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Address {
+  id         String  @id @default(cuid())
+  userId     String
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label      String? // e.g. Home, Office
+  recipient  String
+  phone      String?
+  line1      String
+  line2      String?
+  city       String
+  province   String
+  postalCode String
+  country    String   @default("South Africa")
+  isDefault  Boolean  @default(false)
+  orders     Order[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Order {
+  id               String        @id @default(cuid())
+  orderNumber      String        @unique @default(uuid())
+  status           OrderStatus   @default(PENDING)
+  userId           String
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addressId        String
+  shippingAddress  Address       @relation(fields: [addressId], references: [id])
+  subtotalInCents  Int
+  shippingInCents  Int           @default(0)
+  totalInCents     Int
+  notes            String?
+  items            OrderItem[]
+  placedAt         DateTime      @default(now())
+  fulfilledAt      DateTime?
+}
+
+model OrderItem {
+  id               String   @id @default(cuid())
+  orderId          String
+  productId        String?
+  productName      String
+  productSnapshot  String? // JSON payload for historical record if needed
+  quantity         Int      @default(1)
+  unitPriceInCents Int
+  order            Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product          Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  userId    String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([userId])
+}

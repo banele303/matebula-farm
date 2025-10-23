@@ -1,80 +1,32 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+
+const heroImage = {
+  src: "/eggs-hero.jpg",
+  alt: "Farm fresh eggs on hay",
+};
 
 export default function Hero() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  
-  const images = [
-    { src: "/eggs5.jpg", alt: "Fresh farm eggs" },
-    { src: "/eggs4.jpg", alt: "Premium quality eggs" },
-    { src: "/chicken-layers5.jpg", alt: "Free-range chickens" },
-    { src: "/eggegs.jpg", alt: "Egg production" },
-    { src: "/spinash-hero.jpg", alt: "Fresh vegetables" },
-    { src: "/eggs-hero.jpg", alt: "Farm fresh eggs" },
-    { src: "/plot-hero.jpg", alt: "Farm landscape" },
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000); // Change image every 5 seconds
-
-    return () => clearInterval(timer);
-  }, [images.length]);
-
   return (
-    <section className="relative h-[80vh] min-h-[600px] max-h-[900px] flex items-center overflow-hidden bg-gradient-to-br from-amber-900 via-brown-800 to-orange-900 pt-20 sm:pt-24">
-      {/* Background Image Carousel with Overlay */}
+    <section className="relative h-[80vh] min-h-[600px] max-h-[900px] flex items-center overflow-hidden bg-neutral-950 pt-20 sm:pt-24">
       <div className="absolute inset-0">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-            className="absolute inset-0"
-          >
-            <Image
-              src={images[currentIndex].src}
-              alt={images[currentIndex].alt}
-              fill
-              className="object-cover opacity-50"
-              priority={currentIndex === 0}
-              quality={90}
-            />
-          </motion.div>
-        </AnimatePresence>
-        {/* Minimal overlay for maximum image visibility */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/25 via-brown-800/20 to-orange-800/25" />
-        <div className="absolute inset-0 bg-gradient-to-t from-amber-950/20 via-transparent to-transparent" />
+        <Image
+          src={heroImage.src}
+          alt={heroImage.alt}
+          fill
+          priority
+          quality={90}
+          className="object-cover opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
       </div>
 
-      {/* Image Indicators */}
-      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              index === currentIndex 
-                ? "w-8 bg-amber-400 shadow-lg shadow-amber-400/50" 
-                : "w-1.5 bg-white/50 hover:bg-white/70"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
+      <div className="absolute -top-10 right-10 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-[420px] h-[420px] bg-orange-500/10 rounded-full blur-3xl" />
 
-      {/* Decorative elements - warm and earthy */}
-      <div className="absolute top-20 right-20 w-72 h-72 bg-amber-400/5 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 left-20 w-96 h-96 bg-orange-400/5 rounded-full blur-3xl animate-pulse" 
-           style={{ animationDelay: '2s' }} 
-      />
-      
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 py-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
@@ -84,17 +36,6 @@ export default function Hero() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-white"
           >
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="inline-flex items-center gap-2 bg-amber-600/20 backdrop-blur-md border border-amber-400/30 px-4 py-2 rounded-full text-sm font-semibold mb-6"
-            >
-              <span className="w-2 h-2 bg-amber-300 rounded-full animate-pulse shadow-sm shadow-amber-300" />
-              <span className="text-amber-50">B-BBEE Level 1 Certified</span>
-            </motion.div>
-
             {/* Main Heading */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -169,33 +110,27 @@ export default function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Right Content - Feature Cards */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="hidden lg:grid grid-cols-2 gap-4"
+            className="hidden lg:block"
           >
-            {[
-              { icon: "🥚", title: "A-Grade Eggs", desc: "Fresh daily from free-range hens" },
-              { icon: "🥬", title: "Organic Vegetables", desc: "Grown without chemicals" },
-              { icon: "🚚", title: "Same-Day Delivery", desc: "Orders before 10am" },
-              { icon: "📞", title: "24/7 Support", desc: "+27 73 523 0659" }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 + index * 0.1, duration: 0.5 }}
-                className="group bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl hover:bg-white/15 hover:border-white/40 transition-all hover:scale-105 hover:shadow-xl hover:shadow-amber-600/20 cursor-pointer"
-              >
-                <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
-                  {item.icon}
-                </div>
-                <h3 className="font-bold text-white mb-1.5 text-base">{item.title}</h3>
-                <p className="text-sm text-amber-100">{item.desc}</p>
-              </motion.div>
-            ))}
+            <div className="relative h-[520px] w-full max-w-xl ml-auto rounded-3xl overflow-hidden border border-white/10 shadow-[0_40px_120px_rgba(0,0,0,0.45)]">
+              <Image
+                src="/eggs5.jpg"
+                alt="Mathebula Farm crates of eggs"
+                fill
+                className="object-cover"
+                quality={95}
+                priority={false}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 text-white flex flex-col gap-1">
+                <p className="text-sm uppercase tracking-[0.35em] text-amber-200">Mathebula Farm</p>
+                <p className="text-2xl font-semibold">Supplying premium farm-fresh eggs across Gauteng</p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>

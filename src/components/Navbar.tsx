@@ -1,12 +1,25 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingCart, UserCircle2 } from "lucide-react";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-nextjs";
+import {
+  LoginLink,
+  LogoutLink,
+  RegisterLink,
+} from "@kinde-oss/kinde-auth-nextjs/components";
+import { CartDrawer } from "@/components/cart/CartDrawer";
+import { useCart } from "@/hooks/useCart";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { isAuthenticated, user } = useKindeAuth();
+  const { cart } = useCart();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -16,52 +29,33 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const links = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/products", label: "Products" },
-    { href: "/services", label: "Services" },
-    { href: "/gallery", label: "Gallery" },
-    { href: "/partners", label: "Partners" },
-    { href: "/contact", label: "Contact" }
-  ];
+  // Avoid SSR/CSR markup mismatch by deferring auth-dependent UI until mounted
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const links = useMemo(() => {
+    const baseLinks = [
+      { href: "/", label: "Home" },
+      { href: "/about", label: "About" },
+      { href: "/products", label: "Shop" },
+      { href: "/services", label: "Services" },
+      { href: "/gallery", label: "Gallery" },
+      { href: "/partners", label: "Partners" },
+      { href: "/contact", label: "Contact" },
+    ];
+
+    // Only inject Dashboard on client after mount to keep SSR and first client render identical
+    if (mounted && isAuthenticated) {
+      baseLinks.splice(3, 0, { href: "/dashboard", label: "Dashboard" });
+    }
+
+    return baseLinks;
+  }, [mounted, isAuthenticated]);
 
   return (
     <>
-      {/* Top Info Bar */}
-      <div className="bg-gradient-to-r from-amber-900 via-brown-800 to-orange-900 text-white py-2.5 text-sm border-b border-amber-700/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-between items-center gap-4">
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-              <a 
-                href="tel:+27735230659" 
-                className="flex items-center gap-2 hover:text-amber-200 transition-colors group"
-              >
-                <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                </svg>
-                <span className="font-medium">+27 73 523 0659</span>
-              </a>
-              <a 
-                href="mailto:info@mathebulafarm.co.za" 
-                className="hidden sm:flex items-center gap-2 hover:text-amber-200 transition-colors group"
-              >
-                <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                </svg>
-                <span className="font-medium">info@mathebulafarm.co.za</span>
-              </a>
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-              <div className="flex items-center gap-1.5 bg-amber-600/30 px-3 py-1.5 rounded-full border border-amber-400/30 backdrop-blur-sm">
-                <span className="w-2 h-2 bg-amber-300 rounded-full animate-pulse shadow-sm shadow-amber-300" />
-                <span className="font-semibold text-amber-50">B-BBEE Level 1</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
       {/* Main Navigation */}
       <motion.nav 
@@ -75,12 +69,12 @@ export default function Navbar() {
         transition={{ duration: 0.5 }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20 sm:h-24">
+          <div className="flex justify-between items-center h-24 sm:h-28">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative">
                 <div className="absolute inset-0 bg-amber-500/15 blur-xl group-hover:bg-amber-500/25 transition-all rounded-full" />
-                <div className="relative w-24 h-24 sm:w-28 sm:h-28 transform group-hover:scale-105 transition-transform duration-300">
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32 transform group-hover:scale-105 transition-transform duration-300">
                   <Image
                     src="/new-logo.png"
                     alt="Mathebula Farm Logo"
@@ -107,19 +101,57 @@ export default function Navbar() {
             </div>
 
             {/* CTA Button */}
-            <div className="hidden lg:flex items-center gap-4">
-              <Link 
-                href="/contact" 
-                className="group relative px-6 py-3 bg-gradient-to-r from-amber-700 via-amber-600 to-orange-600 text-white font-bold rounded-xl overflow-hidden transition-all hover:shadow-xl hover:shadow-amber-600/30 hover:scale-105 active:scale-95"
+            <div className="hidden lg:flex items-center gap-3">
+              <Link
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  setIsCartOpen(true);
+                }}
+                className="relative group flex items-center gap-2 px-4 py-2.5 rounded-xl border border-amber-200/70 text-amber-900 font-semibold text-sm hover:bg-amber-50 transition-colors"
+                aria-label="Open cart"
               >
-                <span className="relative z-10 flex items-center gap-2 text-sm">
-                  Order Now
-                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-700 via-amber-700 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ShoppingCart className="w-5 h-5 transition-transform group-hover:scale-105" />
+                <span>Cart</span>
+                {mounted && (cart?.items?.length ?? 0) > 0 && (
+                  <span className="absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-orange-600 text-white text-[10px] leading-5 text-center font-bold shadow-md">
+                    {cart?.items.length}
+                  </span>
+                )}
               </Link>
+
+              {mounted && isAuthenticated ? (
+                <>
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-900 text-white font-semibold text-sm hover:bg-amber-800 transition-colors"
+                  >
+                    <UserCircle2 className="w-5 h-5" />
+                    <span>{user?.given_name ?? "My Account"}</span>
+                  </Link>
+                  <LogoutLink
+                    postLogoutRedirectURL="/"
+                    className="px-4 py-2.5 text-sm font-semibold text-amber-900 hover:text-amber-700 transition-colors"
+                  >
+                    Sign out
+                  </LogoutLink>
+                </>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <LoginLink className="px-4 py-2.5 text-sm font-semibold text-amber-900 hover:text-amber-700 transition-colors">
+                    Sign in
+                  </LoginLink>
+                  <RegisterLink className="group relative px-6 py-3 bg-gradient-to-r from-amber-700 via-amber-600 to-orange-600 text-white font-bold rounded-xl overflow-hidden transition-all hover:shadow-xl hover:shadow-amber-600/30 hover:scale-105 active:scale-95">
+                    <span className="relative z-10 flex items-center gap-2 text-sm">
+                      Create account
+                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-700 via-amber-700 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </RegisterLink>
+                </div>
+              )}
             </div>
             
             {/* Mobile Menu Button */}
@@ -176,15 +208,50 @@ export default function Navbar() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: links.length * 0.05 }}
-                  className="pt-4 border-t border-amber-100"
+                  className="pt-4 border-t border-amber-100 space-y-4"
                 >
-                  <Link
-                    href="/contact"
-                    className="block px-4 py-3.5 bg-gradient-to-r from-amber-700 via-amber-600 to-orange-600 text-white text-center font-bold rounded-xl hover:shadow-lg hover:shadow-amber-600/30 transition-all active:scale-95"
-                    onClick={() => setIsOpen(false)}
+                  <button
+                    onClick={() => {
+                      setIsCartOpen(true);
+                      setIsOpen(false);
+                    }}
+                    className="relative w-full px-4 py-3.5 bg-gradient-to-r from-amber-700 via-amber-600 to-orange-600 text-white text-center font-bold rounded-xl hover:shadow-lg hover:shadow-amber-600/30 transition-all active:scale-95"
                   >
-                    Order Now →
-                  </Link>
+                    View Cart →
+                    {mounted && (cart?.items?.length ?? 0) > 0 && (
+                      <span className="absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-white text-amber-900 text-[10px] leading-5 text-center font-bold">
+                        {cart?.items.length}
+                      </span>
+                    )}
+                  </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-semibold">
+                    {isAuthenticated ? (
+                      <>
+                        <Link
+                          href="/account"
+                          className="px-4 py-3 bg-white text-amber-900 rounded-xl border border-amber-100 text-center hover:bg-amber-50 transition-colors"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          My Account
+                        </Link>
+                        <LogoutLink
+                          postLogoutRedirectURL="/"
+                          className="px-4 py-3 bg-white text-amber-900 rounded-xl border border-amber-100 text-center hover:bg-amber-50 transition-colors"
+                        >
+                          Sign out
+                        </LogoutLink>
+                      </>
+                    ) : (
+                      <>
+                        <LoginLink className="px-4 py-3 bg-white text-amber-900 rounded-xl border border-amber-100 text-center hover:bg-amber-50 transition-colors">
+                          Sign in
+                        </LoginLink>
+                        <RegisterLink className="px-4 py-3 bg-white text-amber-900 rounded-xl border border-amber-100 text-center hover:bg-amber-50 transition-colors">
+                          Create account
+                        </RegisterLink>
+                      </>
+                    )}
+                  </div>
                 </motion.div>
               </div>
             </motion.div>
