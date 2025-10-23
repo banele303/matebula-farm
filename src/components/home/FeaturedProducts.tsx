@@ -219,7 +219,7 @@ export default function FeaturedProducts() {
         </div>
 
         {/* View All Products CTA */}
-        <div className="text-center">
+        <div className="text-center mt-16">
           <Link
             href="/products"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
