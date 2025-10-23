@@ -28,8 +28,6 @@ export function ThemeProvider({
   storageKey = "mathebula-farm-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme] = useState<Theme>("light");
-
   useEffect(() => {
     const root = window.document.documentElement;
 

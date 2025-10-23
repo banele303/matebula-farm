@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // DELETE /api/products/[id]/images/[imageId] - Delete a product image
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string; imageId: string } }
+  { params }: { params: Promise<{ id: string; imageId: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -14,7 +14,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id: productId, imageId } = params;
+    const { id: productId, imageId } = await params;
 
     // Verify the image belongs to this product
     const image = await prisma.productImage.findFirst({
