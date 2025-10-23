@@ -126,6 +126,13 @@ export default async function ProductPage({ params }: PageProps) {
 
           {/* Info */}
           <div>
+            {/* Sale Countdown - Detailed */}
+            {showCountdown && saleEndsAt && (
+              <div className="mb-6">
+                <SaleCountdown saleEndsAt={saleEndsAt} variant="detailed" />
+              </div>
+            )}
+
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-extrabold leading-tight">{product.name}</h1>
@@ -133,7 +140,6 @@ export default async function ProductPage({ params }: PageProps) {
                   <p className="mt-1 text-sm text-amber-800/70">{product.category.name}</p>
                 )}
               </div>
-              {showCountdown && saleEndsAt ? <SaleCountdown saleEndsAt={saleEndsAt} /> : null}
             </div>
 
             <div className="mt-6 flex flex-wrap items-baseline gap-3">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShoppingCart, TrendingUp, Star } from "lucide-react";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { SaleCountdown } from "@/components/products/SaleCountdown";
 
 interface Product {
   id: string;
@@ -17,6 +18,7 @@ interface Product {
   unit: string | null;
   onSale: boolean;
   saleDiscountPercent: number | null;
+  saleEndsAt: string | null;
   images: { url: string; altText: string | null }[];
   category: { name: string; slug: string } | null;
 }
@@ -96,129 +98,122 @@ export default function FeaturedProducts() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {products.map((product, index) => {
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+          {products.map((product) => {
             const price = product.priceInCents / 100;
             const comparePrice = product.compareAtPriceCents
               ? product.compareAtPriceCents / 100
               : null;
             const savings = comparePrice ? comparePrice - price : 0;
-            const discount = product.saleDiscountPercent || 
-              (comparePrice ? Math.round((savings / comparePrice) * 100) : 0);
+            
+            const heroImage = product.images[0]?.url ?? "/eggs5.jpg";
+            const formattedPrice = new Intl.NumberFormat("en-ZA", {
+              style: "currency",
+              currency: "ZAR",
+            }).format(price);
+            
+            const showCountdown = Boolean(product.onSale && product.saleEndsAt);
 
             return (
-              <div
+              <article
                 key={product.id}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-amber-200 transform hover:-translate-y-1"
-                style={{
-                  animationDelay: `${index * 100}ms`,
-                }}
+                className="flex h-full flex-col overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition-shadow hover:shadow-lg"
               >
-                {/* Product Image */}
-                <Link href={`/products/${product.slug}`} className="block relative overflow-hidden bg-gradient-to-br from-amber-50 to-orange-50">
-                  <div className="aspect-square relative">
-                    {product.images[0] ? (
+                <Link href={`/products/${product.slug}`} className="block relative h-52 w-full mt-2">
+                  <div className="absolute inset-0 mx-2 bg-amber-50 rounded-xl overflow-hidden">
+                    <div className="relative w-full h-full">
                       <Image
-                        src={product.images[0].url}
-                        alt={product.images[0].altText || product.name}
+                        src={heroImage}
+                        alt={product.images[0]?.altText ?? product.name}
                         fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                       />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-100 to-orange-100">
-                        <ShoppingCart className="w-20 h-20 text-amber-300" />
-                      </div>
-                    )}
-                    
-                    {/* Sale Badge */}
-                    {discount > 0 && (
-                      <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-orange-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg">
-                        -{discount}%
-                      </div>
-                    )}
+                    </div>
+                  </div>
 
-                    {/* Stock Badge */}
-                    {product.stock < 10 && product.stock > 0 && (
-                      <div className="absolute top-4 left-4 bg-amber-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
-                        Only {product.stock} left
-                      </div>
-                    )}
+                  {/* Savings Badge */}
+                  {savings > 0 && (
+                    <span className="absolute top-3 left-4 rounded-full bg-emerald-600/95 text-white text-[11px] font-bold px-2.5 py-1 shadow-md">
+                      Save R{savings.toFixed(2)}
+                    </span>
+                  )}
 
-                    {/* Out of Stock */}
-                    {product.stock === 0 && (
-                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
-                        <span className="text-white font-bold text-lg">Out of Stock</span>
-                      </div>
+                  {/* Stock Warning - Top Right */}
+                  {product.stock < 10 && product.stock > 0 && (
+                    <span className="absolute top-3 right-4 rounded-full bg-amber-500/95 text-white text-[11px] font-bold px-2.5 py-1 shadow-md">
+                      Only {product.stock} left
+                    </span>
+                  )}
+
+                  {/* Out of Stock Overlay */}
+                  {product.stock === 0 && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm mx-2 rounded-xl">
+                      <span className="text-white font-bold text-lg">Out of Stock</span>
+                    </div>
+                  )}
+
+                  {/* Bottom Badges and Countdown */}
+                  <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      {product.unit && (
+                        <span className="inline-flex items-center rounded-full bg-amber-50/95 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800 shadow-sm ring-1 ring-amber-200/60">
+                          {product.unit}
+                        </span>
+                      )}
+                    </div>
+                    {showCountdown && product.saleEndsAt && (
+                      <SaleCountdown saleEndsAt={product.saleEndsAt} variant="compact" />
                     )}
                   </div>
                 </Link>
 
                 {/* Product Info */}
-                <div className="p-6">
-                  {/* Category */}
-                  {product.category && (
-                    <Link
-                      href={`/products?category=${product.category.slug}`}
-                      className="inline-block text-xs font-semibold text-amber-600 hover:text-amber-700 uppercase tracking-wider mb-2"
-                    >
-                      {product.category.name}
-                    </Link>
-                  )}
+                <div className="flex flex-1 flex-col gap-4 p-4">
+                  <div>
+                    {/* Category */}
+                    {product.category && (
+                      <Link
+                        href={`/products?category=${product.category.slug}`}
+                        className="inline-block text-[10px] font-semibold text-amber-600 hover:text-amber-700 uppercase tracking-wider mb-1"
+                      >
+                        {product.category.name}
+                      </Link>
+                    )}
 
-                  {/* Product Name */}
-                  <Link href={`/products/${product.slug}`}>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-amber-700 transition-colors line-clamp-2">
-                      {product.name}
+                    {/* Product Name */}
+                    <h3 className="text-base font-semibold text-amber-900 line-clamp-2">
+                      <Link href={`/products/${product.slug}`}>{product.name}</Link>
                     </h3>
-                  </Link>
-
-                  {/* Description */}
-                  {product.shortDescription && (
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                      {product.shortDescription}
-                    </p>
-                  )}
-
-                  {/* Price Section */}
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="text-2xl font-bold text-gray-900">
-                      R{price.toFixed(2)}
-                    </span>
-                    {comparePrice && (
-                      <span className="text-sm text-gray-400 line-through">
-                        R{comparePrice.toFixed(2)}
-                      </span>
-                    )}
-                    {product.unit && (
-                      <span className="text-sm text-gray-500">/ {product.unit}</span>
-                    )}
                   </div>
 
-                  {/* Savings Badge */}
-                  {savings > 0 && (
-                    <div className="mb-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-sm font-semibold">
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      Save R{savings.toFixed(2)}
+                  {/* Price and Add to Cart */}
+                  <div className="mt-auto space-y-2 text-sm text-amber-800">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-lg font-bold text-amber-900">{formattedPrice}</p>
+                      </div>
+                      
+                      {product.stock > 0 ? (
+                        <AddToCartButton 
+                          productId={product.id} 
+                          quantity={1}
+                          className="w-auto px-3 py-2 text-xs"
+                        >
+                          Add to Cart
+                        </AddToCartButton>
+                      ) : (
+                        <button
+                          disabled
+                          className="w-auto px-3 py-2 text-xs bg-gray-300 text-gray-500 font-semibold rounded-xl cursor-not-allowed"
+                        >
+                          Out of Stock
+                        </button>
+                      )}
                     </div>
-                  )}
-
-                  {/* Add to Cart Button */}
-                  {product.stock > 0 ? (
-                    <AddToCartButton
-                      productId={product.id}
-                      quantity={1}
-                      className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
-                    />
-                  ) : (
-                    <button
-                      disabled
-                      className="w-full bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-xl cursor-not-allowed"
-                    >
-                      Out of Stock
-                    </button>
-                  )}
+                  </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
