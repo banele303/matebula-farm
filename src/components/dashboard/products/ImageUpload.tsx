@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X } from "lucide-react";
+import Image from "next/image";
 
 interface ImageUploadProps {
   files: File[];
@@ -104,10 +105,13 @@ export function ImageUpload({ files, onChange, maxFiles = 10, required = false }
               key={index}
               className="relative group aspect-square rounded-xl overflow-hidden border-2 border-amber-100 dark:border-border bg-amber-50 dark:bg-muted"
             >
-              <img
+              <Image
                 src={getPreviewUrl(file)}
                 alt={`Preview ${index + 1}`}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 20vw"
+                className="object-cover"
+                onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
               />
 
               {/* Remove Button */}
@@ -117,13 +121,13 @@ export function ImageUpload({ files, onChange, maxFiles = 10, required = false }
                   e.stopPropagation();
                   removeFile(index);
                 }}
-                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10"
               >
                 <X className="w-4 h-4" />
               </button>
 
               {/* File Name */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                 <p className="text-xs text-white truncate">{file.name}</p>
               </div>
             </div>

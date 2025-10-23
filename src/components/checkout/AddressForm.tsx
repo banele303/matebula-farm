@@ -23,6 +23,18 @@ interface AddressFormProps {
   onCancel?: () => void;
 }
 
+type ApiAddress = {
+  id: string;
+  recipient: string;
+  line1: string;
+  line2?: string | null;
+  city: string;
+  province: string;
+  postalCode: string;
+  isDefault?: boolean | null;
+  label?: string | null;
+};
+
 type AddressPayload = {
   recipient: string;
   line1: string;
@@ -38,7 +50,7 @@ export function AddressForm({ hasSavedAddresses, initialAddress, onSuccess, onCa
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = Boolean(initialAddress);
 
-  function normalizeAddress(address: any): AddressDetails {
+  function normalizeAddress(address: ApiAddress): AddressDetails {
     return {
       id: address.id,
       recipient: address.recipient,

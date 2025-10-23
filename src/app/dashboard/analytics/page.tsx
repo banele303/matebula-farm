@@ -1,13 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { OrdersCharts } from "@/components/dashboard/orders/OrdersCharts";
 import { AnalyticsCharts } from "@/components/dashboard/analytics/AnalyticsCharts";
 import { OrderStatus } from "@prisma/client";
 
 function parseRange(searchParams: { [key: string]: string | string[] | undefined }) {
   const r = typeof searchParams?.range === "string" ? parseInt(searchParams.range) : NaN;
-  if ([7, 30, 90, 365].includes(r)) return r as 7 | 30 | 90 | 365;
-  return 90 as 90;
+  const validRanges = [7, 30, 90, 365] as const;
+  if (validRanges.includes(r as (typeof validRanges)[number])) return r as (typeof validRanges)[number];
+  return 90 as const;
 }
 
 function startOfDay(d: Date) {
@@ -16,18 +16,17 @@ function startOfDay(d: Date) {
   return x;
 }
 
-export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+export default async function AnalyticsPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const user = await requireUser("/dashboard/analytics");
   if (user.role !== "ADMIN") return null;
 
-  const sp = await searchParams;
-  const range = parseRange(sp);
+  const range = parseRange(searchParams);
   const now = new Date();
   const start = startOfDay(new Date(now));
   start.setDate(now.getDate() - (range - 1));
 
   // Fetch data in parallel
-  const [orders, orderItems, newCustomersCount, revenueAgg, statusGroups] = await Promise.all([
+  const [orders, orderItems, revenueAgg, statusGroups] = await Promise.all([
     prisma.order.findMany({
       where: { placedAt: { gte: start } },
       select: {
@@ -48,7 +47,6 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         product: { select: { name: true, category: { select: { name: true } } } },
       },
     }),
-    prisma.user.count({ where: { role: "CUSTOMER", createdAt: { gte: start } } }),
     prisma.order.aggregate({ where: { placedAt: { gte: start } }, _sum: { totalInCents: true } }),
     prisma.order.groupBy({ by: ["status"], where: { placedAt: { gte: start } }, _count: { status: true } }),
   ]);
@@ -87,8 +85,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
   // Orders by status
   const statusCounts: Record<OrderStatus, number> = { PENDING: 0, PAID: 0, FULFILLED: 0, CANCELLED: 0 };
-  statusGroups.forEach((g: any) => {
-    statusCounts[g.status as OrderStatus] = g._count.status;
+  statusGroups.forEach((g: { status: OrderStatus; _count: { status: number } }) => {
+    statusCounts[g.status] = g._count.status;
   });
   const statusData = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
 
@@ -163,7 +161,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-amber-100 dark:border-border bg-white dark:bg-card p-6 shadow-sm hover:shadow-md transition-shadow">
             <p className="text-xs uppercase tracking-widest text-amber-700/70 dark:text-muted-foreground font-semibold">{s.label}</p>
-            <p className="mt-2 text-2xl font-bold text-amber-900 dark:text-foreground">{s.value as any}</p>
+            <p className="mt-2 text-2xl font-bold text-amber-900 dark:text-foreground">{s.value}</p>
           </div>
         ))}
       </div>

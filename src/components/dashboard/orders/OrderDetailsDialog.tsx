@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { Order, OrderItem, Address, User, OrderStatus } from "@prisma/client";
+import { Order, OrderItem, Address, User } from "@prisma/client";
 
 export type OrderWithRelations = Order & {
   user: User;

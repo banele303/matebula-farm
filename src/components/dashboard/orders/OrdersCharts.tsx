@@ -92,7 +92,7 @@ export function OrdersCharts({ orders }: OrdersChartsProps) {
             <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="#8a6b3f" />
             <YAxis yAxisId="left" tick={{ fontSize: 12 }} stroke="#8a6b3f" />
             <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} stroke="#8a6b3f" />
-            <Tooltip formatter={(value: any, name: any) => (name === "Revenue" ? formatCurrencyZAR(value) : value)} />
+            <Tooltip formatter={(value: number, name: string) => (name === "Revenue" ? formatCurrencyZAR(value) : value)} />
             <Legend />
             <Line yAxisId="left" type="monotone" dataKey="Orders" stroke="#f59e0b" strokeWidth={3} dot={false} />
             <Line yAxisId="right" type="monotone" dataKey="Revenue" stroke="#059669" strokeWidth={3} dot={false} />

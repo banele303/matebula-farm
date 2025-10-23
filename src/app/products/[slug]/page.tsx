@@ -7,13 +7,23 @@ import AddToCartSection from "@/components/products/AddToCartSection";
 import ReviewStars from "@/components/products/ReviewStars";
 import WriteReviewPanel from "@/components/products/WriteReviewPanel";
 
+type ReviewWithUser = {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: Date;
+  user: {
+    name: string | null;
+  } | null;
+};
+
 type PageProps = {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 };
 import { notFound, redirect } from "next/navigation";
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug } = params;
   let product = await prisma.product.findUnique({ where: { slug } });
   if (!product) {
     // Fallback: treat slug as product id for legacy links, no redirect in metadata phase
@@ -27,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProductPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { slug } = params;
   const product = await prisma.product.findUnique({
     where: { slug },
     include: {
@@ -79,8 +89,11 @@ export default async function ProductPage({ params }: PageProps) {
 
   let average = 0;
   let reviewCount = 0;
-  let reviews: any[] = [];
-  const reviewModel = (prisma as any).review;
+  let reviews: ReviewWithUser[] = [];
+  // The 'review' model is optional, so we access it dynamically
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const reviewModel = prisma.review;
   if (reviewModel) {
     const [aggregate, revs] = await Promise.all([
       reviewModel.aggregate({ where: { productId: product.id }, _avg: { rating: true }, _count: { _all: true } }),
@@ -93,7 +106,7 @@ export default async function ProductPage({ params }: PageProps) {
     ]);
     average = aggregate._avg.rating ?? 0;
     reviewCount = aggregate._count._all;
-    reviews = revs as any[];
+    reviews = revs;
   }
 
   return (
@@ -174,7 +187,7 @@ export default async function ProductPage({ params }: PageProps) {
             {reviews.length === 0 ? (
               <p className="text-sm text-amber-800/80">No reviews yet. Be the first to review this product.</p>
             ) : (
-              reviews.map((r: any) => (
+              reviews.map((r) => (
                 <div key={r.id} className="rounded-lg border border-amber-200 p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">

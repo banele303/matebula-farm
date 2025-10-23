@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { OrderStatus } from "@prisma/client";
-import { Package, CheckCircle2, Clock, XCircle, ShoppingCart } from "lucide-react";
+import { Package, CheckCircle2, Clock, ShoppingCart } from "lucide-react";
 import { OrdersTable } from "@/components/dashboard/orders/OrdersTable";
 import { OrdersCharts } from "@/components/dashboard/orders/OrdersCharts";
 
@@ -31,9 +31,8 @@ async function getOrdersData() {
     CANCELLED: 0,
   };
 
-  counts.forEach((c) => {
-    // @ts-ignore - c.status is of type any from groupBy result
-    statusMap[c.status as OrderStatus] = c._count.status;
+  counts.forEach((c: { status: OrderStatus; _count: { status: number } }) => {
+    statusMap[c.status] = c._count.status;
   });
 
   return {
@@ -112,10 +111,10 @@ export default async function OrdersPage() {
       </div>
 
   {/* Orders Charts (moved above table) */}
-  <OrdersCharts orders={data.orders as any} />
+  <OrdersCharts orders={data.orders} />
 
   {/* Orders Table */}
-  <OrdersTable orders={data.orders as any} />
+  <OrdersTable orders={data.orders} />
     </div>
   );
 }

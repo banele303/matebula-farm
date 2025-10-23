@@ -7,6 +7,7 @@ type RouteParams = Promise<{ id: string }>;
 export async function GET(_: Request, { params }: { params: RouteParams }) {
   const { id } = await params;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const reviewModel = (prisma as any).review;
   if (!reviewModel) {
     return NextResponse.json(
@@ -67,6 +68,7 @@ export async function POST(request: Request, { params }: { params: RouteParams }
     ?? await prisma.product.findUnique({ where: { slug: id }, select: { id: true, isActive: true } });
   if (!product || !product.isActive) return NextResponse.json({ error: "Product not found" }, { status: 404 });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const reviewModel = (prisma as any).review;
   if (!reviewModel) {
     return NextResponse.json(

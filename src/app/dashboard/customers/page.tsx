@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { Users, UserRound, ShoppingCart, MapPin } from "lucide-react";
+import { Users, ShoppingCart, MapPin } from "lucide-react";
 import { CustomersTable } from "@/components/dashboard/customers/CustomersTable";
 
 async function getCustomersData() {
@@ -68,7 +68,7 @@ export default async function CustomersPage() {
         })}
       </div>
 
-      <CustomersTable customers={data.customers as any} ordersByUser={Object.fromEntries(data.ordersByUser)} />
+      <CustomersTable customers={data.customers} ordersByUser={Object.fromEntries(data.ordersByUser)} />
     </div>
   );
 }

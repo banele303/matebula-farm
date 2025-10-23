@@ -71,6 +71,23 @@ export default async function Products({ searchParams }: PageProps) {
 
   const totalPages = Math.max(1, Math.ceil(total / perPage));
 
+  const productCards = products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    shortDescription: product.shortDescription,
+    priceInCents: product.priceInCents,
+    compareAtPriceCents: product.compareAtPriceCents,
+    currency: product.currency,
+    unit: product.unit,
+    isFeatured: product.isFeatured,
+    onSale: product.onSale,
+    saleEndsAt: product.saleEndsAt ? product.saleEndsAt.toISOString() : null,
+    saleDiscountPercent: product.saleDiscountPercent,
+    images: product.images.map((image) => ({ url: image.url, altText: image.altText })),
+    category: product.category,
+  }));
+
   // Build pagination hrefs without accessing window to keep SSR deterministic
   const base = new URLSearchParams();
   if (q) base.set("q", q);
@@ -116,13 +133,13 @@ export default async function Products({ searchParams }: PageProps) {
               />
             </div>
 
-            <ProductsGrid products={products} />
+            <ProductsGrid products={productCards} />
 
             {/* Pagination */}
             <div className="flex items-center justify-between mt-8">
               <p className="text-sm text-amber-800">
-                Showing {products.length === 0 ? 0 : (page - 1) * perPage + 1}–
-                {(page - 1) * perPage + products.length} of {total}
+                Showing {productCards.length === 0 ? 0 : (page - 1) * perPage + 1}–
+                {(page - 1) * perPage + productCards.length} of {total}
               </p>
               <div className="flex items-center gap-2">
                 {prevHref ? (

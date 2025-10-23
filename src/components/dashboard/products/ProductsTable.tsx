@@ -2,9 +2,10 @@
 
 import { Product, ProductCategory, ProductImage } from "@prisma/client";
 import { useState } from "react";
-import { Search, MoreVertical, Edit, Trash2, Eye, AlertCircle, ChevronDown } from "lucide-react";
+import { Search, MoreVertical, Edit, Trash2, AlertCircle, ChevronDown } from "lucide-react";
 import { EditProductDialog } from "./EditProductDialog";
 import { DeleteProductDialog } from "./DeleteProductDialog";
+import Image from "next/image";
 
 type ProductWithRelations = Product & {
   category: ProductCategory | null;
@@ -133,12 +134,14 @@ export function ProductsTable({ products, categories }: ProductsTableProps) {
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-[76px] h-12 min-w-[76px] flex-shrink-0 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 dark:bg-amber-600/20 flex items-center justify-center overflow-hidden">
+                      <div className="relative w-[76px] h-12 min-w-[76px] flex-shrink-0 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 dark:bg-amber-600/20 flex items-center justify-center overflow-hidden">
                         {product.images[0]?.url ? (
-                          <img
+                          <Image
                             src={product.images[0].url}
                             alt={product.images[0].altText || product.name}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
+                            sizes="76px"
                           />
                         ) : (
                           <span className="text-lg">📦</span>

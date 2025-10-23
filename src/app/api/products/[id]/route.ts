@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
+
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
 
 // GET /api/products/[id] - Fetch a single product with relations
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: RouteContext
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
 
     const product = await prisma.product.findUnique({
       where: { id },
@@ -35,10 +42,10 @@ export async function GET(
 // PATCH /api/products/[id] - Update a product
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: RouteContext
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     const user = await getCurrentUser();
 
     if (!user || user.role !== "ADMIN") {
@@ -61,7 +68,7 @@ export async function PATCH(
   };
 
     // Prepare partial update data
-    const data: any = {};
+    const data: Prisma.ProductUpdateInput = {};
     if (typeof name === "string" && name.trim().length) {
       data.name = name;
       data.slug = name
@@ -73,7 +80,9 @@ export async function PATCH(
     if (typeof priceInCents === "number") data.priceInCents = priceInCents;
     if (typeof stock === "number") data.stock = stock;
     if (typeof unit !== "undefined") data.unit = unit ?? null;
-    if (typeof categoryId !== "undefined") data.categoryId = categoryId ?? null;
+    if (typeof categoryId !== "undefined") {
+      data.category = categoryId ? { connect: { id: categoryId } } : { disconnect: true };
+    }
     if (typeof isActive === "boolean") data.isActive = isActive;
     if (typeof onSale === "boolean") data.onSale = onSale;
     if (typeof saleDiscountPercent !== "undefined") {
@@ -81,7 +90,7 @@ export async function PATCH(
       data.saleDiscountPercent = Number.isFinite(v) ? v : null;
     }
     if (typeof saleEndsAt !== "undefined") {
-      data.saleEndsAt = saleEndsAt ? new Date(saleEndsAt as any) : null;
+      data.saleEndsAt = saleEndsAt ? new Date(saleEndsAt) : null;
     }
 
     // Get existing product to check for images
@@ -95,7 +104,7 @@ export async function PATCH(
     }
 
     // Update product
-    const product = await prisma.product.update({
+    await prisma.product.update({
       where: { id },
       data,
       include: {
@@ -139,23 +148,14 @@ export async function PATCH(
 // DELETE /api/products/[id] - Delete a product
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: RouteContext
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     const user = await getCurrentUser();
 
     if (!user || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Check if product exists
-    const product = await prisma.product.findUnique({
-      where: { id },
-    });
-
-    if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     // If product has order items, set their productId to null but preserve historical name/snapshot

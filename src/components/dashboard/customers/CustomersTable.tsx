@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Address, Order, OrderItem, User } from "@prisma/client";
-import { Search, MoreVertical, Eye } from "lucide-react";
+import { Search } from "lucide-react";
 
 export type CustomerWithRelations = User & {
   addresses: Address[];

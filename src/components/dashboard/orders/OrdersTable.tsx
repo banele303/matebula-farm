@@ -109,7 +109,8 @@ export function OrdersTable({ orders }: OrdersTableProps) {
       });
     } finally {
       setUpdating((m) => {
-        const { [orderId]: _, ...rest } = m;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [orderId]: _removed, ...rest } = m;
         return rest;
       });
     }
@@ -136,7 +137,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
           <div className="relative">
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
+              onChange={(e) => setStatusFilter(e.target.value as "all" | OrderStatus)}
               className="appearance-none pl-4 pr-10 py-2.5 rounded-xl border border-amber-200/70 dark:border-input bg-amber-50/30 dark:bg-background text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 dark:focus:ring-ring text-amber-900 dark:text-foreground"
             >
               <option value="all">All Statuses</option>

@@ -92,21 +92,34 @@ async function main() {
     },
   ];
 
-  // Seed admin user
-  const adminUser = await prisma.user.upsert({
+  // Seed admin users
+  const adminUser1 = await prisma.user.upsert({
     where: { email: "Alexsouthflow@gmail.com" },
     update: {
       role: "ADMIN",
     },
     create: {
-      kindeId: "admin_seed_user", // Temporary - will be updated on first Kinde login
+      kindeId: "admin_seed_user_1", // Temporary - will be updated on first Kinde login
       email: "Alexsouthflow@gmail.com",
       name: "Alex Admin",
       role: "ADMIN",
     },
   });
 
-  console.log("✅ Admin user seeded:", adminUser.email);
+  const adminUser2 = await prisma.user.upsert({
+    where: { email: "zifa@mathebulafarm.co.za" },
+    update: {
+      role: "ADMIN",
+    },
+    create: {
+      kindeId: "admin_seed_user_2", // Temporary - will be updated on first Kinde login
+      email: "zifa@mathebulafarm.co.za",
+      name: "Zifa Admin",
+      role: "ADMIN",
+    },
+  });
+
+  console.log("✅ Admin users seeded:", adminUser1.email, adminUser2.email);
 
   // Seed product categories
   for (const category of categoryData) {

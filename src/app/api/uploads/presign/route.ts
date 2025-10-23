@@ -9,7 +9,7 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
-    const { filename, contentType } = await req.json();
+    const { filename } = await req.json();
 
     const configuredRegion = process.env.AWS_REGION?.trim();
     const bucket = process.env.AWS_BUCKET_NAME?.trim();

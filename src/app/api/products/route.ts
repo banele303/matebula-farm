@@ -33,7 +33,18 @@ export async function POST(req: NextRequest) {
     }
 
   const body = await req.json();
-  const { name, description, priceInCents, categoryId, stock, imageUrls, unit, onSale, saleDiscountPercent, saleEndsAt } = body as any;
+  const { name, description, priceInCents, categoryId, stock, imageUrls, unit, onSale, saleDiscountPercent, saleEndsAt } = body as {
+    name: string;
+    description: string;
+    priceInCents: number;
+    categoryId: string;
+    stock: number;
+    imageUrls: string[];
+    unit?: string;
+    onSale?: boolean;
+    saleDiscountPercent?: number;
+    saleEndsAt?: string;
+  };
 
     // Generate slug from name
     const slug = name

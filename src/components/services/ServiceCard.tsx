@@ -10,13 +10,12 @@ interface ServiceCardProps {
   features: string[];
 }
 
-export default function ServiceCard({ 
-  icon, 
-  title, 
-  description, 
-  imageSrc, 
-  imageAlt, 
-  features 
+export default function ServiceCard({
+  title,
+  description,
+  imageSrc,
+  imageAlt,
+  features,
 }: ServiceCardProps) {
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] border-gray-200 p-1 gap-0">

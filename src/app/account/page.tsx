@@ -110,9 +110,14 @@ export default async function AccountPage() {
                     <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">{order.status}</span>
                   </div>
                   <ul className="mt-3 text-xs text-amber-700/70 space-y-1">
-                    {order.items.map((item) => (
-                      <li key={item.id}>{item.product.name} × {item.quantity}</li>
-                    ))}
+                    {order.items.map((item) => {
+                      const productName = item.product?.name ?? "Product removed";
+                      return (
+                        <li key={item.id}>
+                          {productName} × {item.quantity}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               ))}

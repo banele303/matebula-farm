@@ -6,6 +6,7 @@ import { X, Save, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ImageUpload } from "./ImageUpload";
 import { toast } from "sonner";
+import Image from "next/image";
 
 type ProductWithRelations = Product & {
   category: ProductCategory | null;
@@ -51,7 +52,7 @@ export function EditProductDialog({ product, categories, isOpen, onClose }: Edit
         if (!res.ok) return;
         const fresh = await res.json();
         if (!ignore) setExistingImages(fresh.images || []);
-      } catch (_) {
+      } catch {
         // ignore fetch errors for images preview
       }
     })();
@@ -74,7 +75,7 @@ export function EditProductDialog({ product, categories, isOpen, onClose }: Edit
         selectedFiles.forEach((f) => form.append("files", f));
         const uploadRes = await fetch("/api/uploads", { method: "POST", body: form });
         if (!uploadRes.ok) {
-          const err = await uploadRes.json().catch(() => ({} as any));
+          const err: { error?: string } = await uploadRes.json().catch(() => ({}));
           throw new Error(`Upload failed (${uploadRes.status}): ${err.error || uploadRes.statusText}`);
         }
         const { urls } = await uploadRes.json();
@@ -306,7 +307,13 @@ export function EditProductDialog({ product, categories, isOpen, onClose }: Edit
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {existingImages.map((img) => (
                     <div key={img.id} className="relative w-full aspect-square overflow-hidden rounded-xl border border-amber-100 dark:border-border bg-amber-50/30 dark:bg-muted">
-                      <img src={img.url} alt={img.altText || product.name} className="w-full h-full object-cover" />
+                      <Image
+                        src={img.url}
+                        alt={img.altText || product.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 33vw, 25vw"
+                      />
                     </div>
                   ))}
                 </div>

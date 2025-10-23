@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, Upload, Loader2 } from "lucide-react";
+import { Plus, X, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ProductCategory } from "@prisma/client";
 import { ImageUpload } from "./ImageUpload";
@@ -49,7 +49,7 @@ export function AddProductDialog({ categories }: AddProductDialogProps) {
       selectedFiles.forEach((f) => form.append("files", f));
       const uploadRes = await fetch("/api/uploads", { method: "POST", body: form });
       if (!uploadRes.ok) {
-        const err = await uploadRes.json().catch(() => ({} as any));
+        const err = await uploadRes.json().catch(() => ({}));
         throw new Error(`Upload failed (${uploadRes.status}): ${err.error || uploadRes.statusText}`);
       }
       const { urls: imageUrls } = await uploadRes.json();

@@ -68,11 +68,6 @@ export default async function CheckoutPage() {
     );
   }
 
-  const totalFormatted = new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: "ZAR",
-  }).format(subtotal / 100);
-
   const cartItems = cart.items.map((item) => ({
     id: item.id,
     name: item.product.name,

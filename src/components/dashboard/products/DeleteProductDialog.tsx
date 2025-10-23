@@ -5,6 +5,7 @@ import { Product, ProductCategory, ProductImage } from "@prisma/client";
 import { X, Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Image from "next/image";
 
 type ProductWithRelations = Product & {
   category: ProductCategory | null;
@@ -31,7 +32,7 @@ export function DeleteProductDialog({ product, isOpen, onClose }: DeleteProductD
       });
 
       if (!response.ok) {
-        const data = await response.json().catch(() => ({} as any));
+        const data = await response.json().catch(() => ({}));
         if (response.status === 409 && data?.code === "HAS_ORDER_ITEMS") {
           throw new Error(
             "This product has existing order history and cannot be deleted. You can deactivate it instead so it no longer appears in the store."
@@ -104,9 +105,11 @@ export function DeleteProductDialog({ product, isOpen, onClose }: DeleteProductD
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 dark:bg-amber-600/20 flex items-center justify-center overflow-hidden">
                   {product.images[0]?.url ? (
-                    <img
+                    <Image
                       src={product.images[0].url}
                       alt={product.images[0].altText || product.name}
+                      width={48}
+                      height={48}
                       className="w-full h-full object-cover"
                     />
                   ) : (

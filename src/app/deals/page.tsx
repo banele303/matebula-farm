@@ -68,7 +68,7 @@ export default async function DealsPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">⏰ Ending Soon</h2>
             </div>
-            <ProductsGrid products={expiringSoon as any} />
+            <ProductsGrid products={expiringSoon.map(p => ({ ...p, saleEndsAt: p.saleEndsAt?.toISOString() ?? null }))} />
           </section>
         )}
 
@@ -76,7 +76,7 @@ export default async function DealsPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">All Deals</h2>
           </div>
-          <ProductsGrid products={allDeals as any} />
+          <ProductsGrid products={allDeals.map(p => ({ ...p, saleEndsAt: p.saleEndsAt?.toISOString() ?? null }))} />
         </section>
       </main>
     </div>

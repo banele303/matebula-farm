@@ -1,6 +1,7 @@
 "use client";
 import { Card as UICard, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 interface CardProps {
   title: string;
@@ -22,7 +23,7 @@ export default function Card({ title, content, icon, image, className = "" }: Ca
       <UICard className={`h-full hover:shadow-lg transition-shadow ${className}`}>
         {image && (
           <div className="relative h-48 overflow-hidden rounded-t-lg">
-            <img src={image} alt={title} className="w-full h-full object-cover" />
+            <Image src={image} alt={title} layout="fill" objectFit="cover" />
           </div>
         )}
         

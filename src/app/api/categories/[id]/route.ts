@@ -2,15 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
 // PATCH /api/categories/[id] - update category
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, context: RouteContext) {
   try {
     const user = await getCurrentUser();
     if (!user || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await context.params;
     const body = await req.json();
     const { name, description } = body as { name?: string; description?: string | null };
 
@@ -18,7 +24,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
     }
 
-    const data: any = {};
+    const data: {
+      name?: string;
+      slug?: string;
+      description?: string | null;
+    } = {};
     if (typeof name === "string" && name.trim().length) {
       const slug = name
         .toLowerCase()

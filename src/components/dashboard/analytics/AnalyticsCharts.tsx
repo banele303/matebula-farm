@@ -22,13 +22,12 @@ import {
   PolarRadiusAxis,
   Radar,
 } from "recharts";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 type RevenuePoint = { label: string; Orders: number; Revenue: number };
 type StatusPoint = { status: string; count: number };
 type CategoryPoint = { category: string; revenue: number };
 type ProductPoint = { name: string; revenue: number };
-type HourPoint = { hour: string; count: number };
 type ProvincePoint = { province: string; count: number };
 
 export function AnalyticsCharts({
@@ -45,10 +44,8 @@ export function AnalyticsCharts({
   ordersByProvince: ProvincePoint[];
 }) {
   const COLORS = ["#f59e0b", "#fb923c", "#fbbf24", "#eab308", "#fcd34d", "#fde68a", "#78350f", "#a16207"];
-  const [stackMode, setStackMode] = useState<"stack" | "group">("stack");
 
   const statusTotal = useMemo(() => statusData.reduce((s, x) => s + x.count, 0), [statusData]);
-  const provincePalette = ["#f59e0b", "#16a34a", "#2563eb", "#a855f7", "#ef4444", "#06b6d4", "#f97316", "#22c55e", "#6366f1", "#84cc16"];
 
   return (
     <div className="grid gap-8 xl:grid-cols-3">

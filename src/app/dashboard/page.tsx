@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { DailyOrdersChart } from "@/components/dashboard/overview/DailyOrdersChart";
+import NextImage from "next/image";
 
 async function getDashboardData() {
   const sevenDaysAgo = new Date();
@@ -84,7 +85,7 @@ export default async function DashboardPage() {
           <div>
             <p className="text-sm font-semibold opacity-90">Welcome back, {user.name ?? "Admin"}</p>
             <h1 className="text-3xl font-bold mt-1">Dashboard Overview</h1>
-            <p className="text-sm opacity-90 mt-2">Monitor your farm's performance and activities</p>
+            <p className="text-sm opacity-90 mt-2">Monitor your farm&apos;s performance and activities</p>
           </div>
           <div className="flex items-center gap-3">
             <button className="px-5 py-2.5 rounded-xl bg-white/20 backdrop-blur-sm border border-white/40 font-semibold hover:bg-white/30 transition-all text-sm">
@@ -126,7 +127,7 @@ export default async function DashboardPage() {
             </div>
             <button className="text-xs font-semibold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300">View All</button>
           </div>
-          <DailyOrdersChart orders={data.recentOrders as any} />
+          <DailyOrdersChart orders={data.recentOrders} />
         </div>
         <div className="rounded-2xl border border-amber-100 dark:border-border bg-white dark:bg-card p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
@@ -150,7 +151,7 @@ export default async function DashboardPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 dark:bg-amber-600/20 overflow-hidden flex items-center justify-center">
                       {p.images[0]?.url ? (
-                        <img src={p.images[0].url} alt={p.name} className="w-full h-full object-cover" />
+                        <NextImage src={p.images[0].url} alt={p.name} width={40} height={40} className="w-full h-full object-cover" />
                       ) : (
                         <span className="text-base">📦</span>
                       )}
