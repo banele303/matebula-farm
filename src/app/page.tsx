@@ -7,6 +7,7 @@ import VegetableShowcase from "@/components/home/VegetableShowcase";
 import QualityCertifications from "@/components/home/QualityCertifications";
 import CustomerTestimonials from "@/components/home/CustomerTestimonials";
 import GallerySection from "@/components/home/GallerySection";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
 import SectionTitle from "@/components/SectionTitle";
 import ServiceCard from "@/components/services/ServiceCard";
 import HelpFarmerSection from "@/components/services/HelpFarmerSection";
@@ -27,6 +28,8 @@ export default function Home() {
       <EggShowcase />
 
       <VegetableShowcase />
+
+      <FeaturedProducts />
 
       <QualityCertifications />
 

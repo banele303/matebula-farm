@@ -3,17 +3,33 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
 // GET /api/products - List all products
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const searchParams = req.nextUrl.searchParams;
+    const limit = searchParams.get("limit");
+    const featured = searchParams.get("featured");
+    
+    const where: any = {};
+    
+    // Only show active products
+    where.isActive = true;
+    
+    // Filter by featured if requested
+    if (featured === "true") {
+      where.isFeatured = true;
+    }
+
     const products = await prisma.product.findMany({
+      where,
       include: {
         category: true,
         images: { orderBy: { position: "asc" } },
       },
       orderBy: { createdAt: "desc" },
+      ...(limit && { take: parseInt(limit) }),
     });
 
-    return NextResponse.json(products);
+    return NextResponse.json({ products });
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json(

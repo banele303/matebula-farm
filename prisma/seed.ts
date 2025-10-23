@@ -134,7 +134,7 @@ async function main() {
 
   // Seed demo customers and orders if dataset is small
   const existingOrders = await prisma.order.count();
-  if (existingOrders < 60) {
+  if (existingOrders < 150) {
     console.log("ℹ️ Seeding additional customers and orders for richer analytics...");
 
     const seedPeople = [
@@ -150,6 +150,14 @@ async function main() {
       { email: "customer10@example.com", name: "Nomsa G" },
       { email: "customer11@example.com", name: "Musa J" },
       { email: "customer12@example.com", name: "Ayanda B" },
+      { email: "customer13@example.com", name: "Mandla T" },
+      { email: "customer14@example.com", name: "Lindiwe P" },
+      { email: "customer15@example.com", name: "Bongani M" },
+      { email: "customer16@example.com", name: "Precious N" },
+      { email: "customer17@example.com", name: "Themba K" },
+      { email: "customer18@example.com", name: "Zanele D" },
+      { email: "customer19@example.com", name: "Mpho S" },
+      { email: "customer20@example.com", name: "Refilwe H" },
     ];
 
     const customers = await Promise.all(
@@ -216,31 +224,101 @@ async function main() {
     // Helper to random pick
     const rand = (n: number) => Math.floor(Math.random() * n);
 
-    // Create ~80 orders over last 90 days, weighted towards recent days and business hours
-    const targetOrders = 80 - existingOrders;
+    // Create realistic orders with seasonal patterns and growth trends
+    const targetOrders = 200 - existingOrders; // Increased from 80 to 200
     const now = new Date();
+    
+    // Define order patterns for interesting chart shapes
+    const patterns = {
+      // Weekend boost - more orders on Saturdays
+      weekendBoost: (dayOfWeek: number) => dayOfWeek === 6 ? 1.5 : dayOfWeek === 0 ? 1.3 : 1,
+      
+      // Month-end spike (25th-31st)
+      monthEndSpike: (day: number) => day >= 25 ? 1.4 : 1,
+      
+      // Growth trend - more recent orders
+      growthTrend: (daysBack: number) => Math.max(0.3, 1 - (daysBack / 180)),
+      
+      // Business hours peak (9am-5pm)
+      peakHours: (hour: number) => {
+        if (hour >= 9 && hour <= 11) return 1.8; // Morning peak
+        if (hour >= 12 && hour <= 13) return 1.3; // Lunch
+        if (hour >= 15 && hour <= 17) return 1.6; // Afternoon peak
+        if (hour >= 18 && hour <= 20) return 1.2; // Evening
+        return 0.5;
+      }
+    };
+
     for (let i = 0; i < targetOrders; i++) {
       const user = customers[rand(customers.length)];
       const address = addresses.find((a) => a.userId === user.id)!;
 
-      // Skewed day offset: quadratic bias towards recent days
-      const r = Math.random();
-      const daysBack = Math.floor((1 - Math.sqrt(r)) * 90);
+      // Create more realistic date distribution (last 6 months)
+      const daysBack = Math.floor(Math.pow(Math.random(), 1.5) * 180); // Weighted towards recent
       const placedAt = new Date(now);
       placedAt.setDate(now.getDate() - daysBack);
 
-      // Randomize time of day with business-hours bias
-      const business = Math.random() < 0.7; // 70% in 8:00-19:00
-      const hour = business ? 8 + rand(12) : rand(24);
+      // Apply weekly pattern
+      const dayOfWeek = placedAt.getDay();
+      const dayOfMonth = placedAt.getDate();
+      
+      // Combine all patterns to determine if we should create this order
+      const orderProbability = 
+        patterns.weekendBoost(dayOfWeek) * 
+        patterns.monthEndSpike(dayOfMonth) * 
+        patterns.growthTrend(daysBack);
+
+      // Skip some orders based on probability to create realistic gaps
+      if (Math.random() > orderProbability && i < targetOrders - 50) {
+        continue;
+      }
+
+      // Set realistic business hours with peaks
+      let hour: number;
+      const hourRandom = Math.random();
+      if (hourRandom < 0.3) {
+        hour = 9 + rand(3); // Morning peak
+      } else if (hourRandom < 0.5) {
+        hour = 15 + rand(3); // Afternoon peak
+      } else if (hourRandom < 0.7) {
+        hour = 12 + rand(2); // Lunch time
+      } else {
+        hour = 8 + rand(14); // General business hours
+      }
+      
       const minute = rand(60);
       const second = rand(60);
       placedAt.setHours(hour, minute, second, 0);
 
-      const lineCount = 1 + (Math.random() < 0.35 ? 1 : 0);
+      // Vary order sizes - more single items, some bulk orders
+      const orderSizeRandom = Math.random();
+      let lineCount: number;
+      if (orderSizeRandom < 0.5) {
+        lineCount = 1; // 50% single item
+      } else if (orderSizeRandom < 0.8) {
+        lineCount = 2; // 30% two items
+      } else if (orderSizeRandom < 0.95) {
+        lineCount = 3; // 15% three items
+      } else {
+        lineCount = 4 + rand(3); // 5% bulk orders (4-6 items)
+      }
+
       const chosen = Array.from({ length: lineCount }, () => products[rand(products.length)]);
       let subtotal = 0;
       const items = chosen.map((p) => {
-        const qty = 1 + rand(3);
+        // Vary quantities - mostly 1-2, occasionally more
+        const qtyRandom = Math.random();
+        let qty: number;
+        if (qtyRandom < 0.6) {
+          qty = 1;
+        } else if (qtyRandom < 0.85) {
+          qty = 2;
+        } else if (qtyRandom < 0.95) {
+          qty = 3 + rand(2); // 3-4
+        } else {
+          qty = 5 + rand(6); // 5-10 (bulk)
+        }
+        
         subtotal += p.priceInCents * qty;
         return {
           productId: p.id,
@@ -249,12 +327,28 @@ async function main() {
           unitPriceInCents: p.priceInCents,
         };
       });
-      const shipping = 0;
+
+      // Free shipping for orders over R500
+      const shipping = subtotal >= 50000 ? 0 : 5000; // R50 shipping
       const total = subtotal + shipping;
 
-      // Status distribution favoring PAID and FULFILLED
-      const sr = Math.random();
-      const status = sr < 0.05 ? "CANCELLED" : sr < 0.25 ? "PENDING" : sr < 0.65 ? "PAID" : "FULFILLED";
+      // Realistic status distribution
+      const daysSinceOrder = Math.floor((now.getTime() - placedAt.getTime()) / (1000 * 60 * 60 * 24));
+      let status: "PENDING" | "PAID" | "FULFILLED" | "CANCELLED";
+      
+      if (daysSinceOrder < 1) {
+        // Recent orders - mostly pending or paid
+        const sr = Math.random();
+        status = sr < 0.6 ? "PENDING" : sr < 0.95 ? "PAID" : "CANCELLED";
+      } else if (daysSinceOrder < 7) {
+        // Last week - mostly paid or fulfilled
+        const sr = Math.random();
+        status = sr < 0.2 ? "PENDING" : sr < 0.6 ? "PAID" : sr < 0.97 ? "FULFILLED" : "CANCELLED";
+      } else {
+        // Older orders - mostly fulfilled
+        const sr = Math.random();
+        status = sr < 0.05 ? "PENDING" : sr < 0.15 ? "PAID" : sr < 0.97 ? "FULFILLED" : "CANCELLED";
+      }
 
       await prisma.order.create({
         data: {

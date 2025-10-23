@@ -17,7 +17,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "system",
+  theme: "light",
   setTheme: () => null,
 };
 
@@ -25,33 +25,26 @@ const ThemeProviderContext = React.createContext<ThemeProviderState>(initialStat
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "light",
   storageKey = "mathebula-farm-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (typeof window !== "undefined" && (localStorage.getItem(storageKey) as Theme)) || defaultTheme
-  );
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     const root = window.document.documentElement;
 
-    root.classList.remove("light", "dark");
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      root.classList.add(systemTheme);
-      return;
-    }
-
-    root.classList.add(theme);
+    // Always force light mode
+    root.classList.remove("dark");
+    root.classList.add("light");
   }, [theme]);
 
   const value = {
-    theme,
+    theme: "light" as Theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+      // Always keep light mode, ignore any theme changes
+      localStorage.setItem(storageKey, "light");
+      setTheme("light");
     },
   };
 

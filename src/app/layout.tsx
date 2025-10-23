@@ -42,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${barlow.className} antialiased min-h-screen`}>
-        <ThemeProvider defaultTheme="system" storageKey="mathebula-farm-theme">
+        <ThemeProvider defaultTheme="light" storageKey="mathebula-farm-theme">
           <AuthProvider>
             <ConditionalLayout>{children}</ConditionalLayout>
             <Toaster />
