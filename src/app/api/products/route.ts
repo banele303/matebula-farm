@@ -9,7 +9,10 @@ export async function GET(req: NextRequest) {
     const limit = searchParams.get("limit");
     const featured = searchParams.get("featured");
     
-    const where: any = {};
+    const where: {
+      isActive?: boolean;
+      isFeatured?: boolean;
+    } = {};
     
     // Only show active products
     where.isActive = true;

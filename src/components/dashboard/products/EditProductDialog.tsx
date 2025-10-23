@@ -5,6 +5,7 @@ import { Product, ProductCategory, ProductImage } from "@prisma/client";
 import { X, Save, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ImageUpload } from "./ImageUpload";
+import { ImageManager } from "./ImageManager";
 import { toast } from "sonner";
 import Image from "next/image";
 
@@ -29,6 +30,8 @@ export function EditProductDialog({ product, categories, isOpen, onClose }: Edit
   const [isLoading, setIsLoading] = useState(false);
   const today = new Date().toISOString().slice(0, 10);
   const [existingImages, setExistingImages] = useState<ProductImage[]>(product.images || []);
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+  const [imageOrderChanged, setImageOrderChanged] = useState(false);
   const [formData, setFormData] = useState({
     name: product.name,
     description: product.description || "",
@@ -68,9 +71,37 @@ export function EditProductDialog({ product, categories, isOpen, onClose }: Edit
   let progressToast: string | number | undefined;
 
     try {
+      // Step 1: Delete images if any
+      if (imagesToDelete.length > 0) {
+        progressToast = toast.loading("Deleting images...");
+        await Promise.all(
+          imagesToDelete.map((imageId) =>
+            fetch(`/api/products/${product.id}/images/${imageId}`, {
+              method: "DELETE",
+            })
+          )
+        );
+      }
+
+      // Step 2: Update image positions if reordered
+      if (imageOrderChanged) {
+        progressToast = toast.loading("Updating image order...", { id: progressToast });
+        await fetch(`/api/products/${product.id}/images/reorder`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            images: existingImages.map((img, idx) => ({
+              id: img.id,
+              position: idx,
+            })),
+          }),
+        });
+      }
+
+      // Step 3: Upload new images if any
       let imageUrls: string[] = [];
       if (selectedFiles.length > 0) {
-        // Server-side upload (same behavior as before): browser -> Next.js -> S3
+        progressToast = toast.loading("Uploading new images...", { id: progressToast });
         const form = new FormData();
         selectedFiles.forEach((f) => form.append("files", f));
         const uploadRes = await fetch("/api/uploads", { method: "POST", body: form });
@@ -80,11 +111,10 @@ export function EditProductDialog({ product, categories, isOpen, onClose }: Edit
         }
         const { urls } = await uploadRes.json();
         imageUrls = urls || [];
-
-        progressToast = toast.loading("Updating product...");
       }
 
-      // Step 3: Patch the product record
+      // Step 4: Update product data
+      progressToast = toast.loading("Updating product...", { id: progressToast });
       const response = await fetch(`/api/products/${product.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -106,6 +136,9 @@ export function EditProductDialog({ product, categories, isOpen, onClose }: Edit
         description: `${formData.name} has been updated`,
       });
 
+      // Reset states
+      setImagesToDelete([]);
+      setImageOrderChanged(false);
       onClose();
       router.refresh();
     } catch (error) {
@@ -117,6 +150,34 @@ export function EditProductDialog({ product, categories, isOpen, onClose }: Edit
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDeleteImage = (imageId: string) => {
+    setImagesToDelete([...imagesToDelete, imageId]);
+    setExistingImages(existingImages.filter((img) => img.id !== imageId));
+  };
+
+  const handleReorderImages = (reorderedImages: ProductImage[]) => {
+    setExistingImages(reorderedImages);
+    setImageOrderChanged(true);
+  };
+
+  const handleSetCover = (imageId: string) => {
+    const imageIndex = existingImages.findIndex((img) => img.id === imageId);
+    if (imageIndex === -1) return;
+
+    const newImages = [...existingImages];
+    const [coverImage] = newImages.splice(imageIndex, 1);
+    newImages.unshift(coverImage);
+
+    // Update positions
+    const updatedImages = newImages.map((img, idx) => ({
+      ...img,
+      position: idx,
+    }));
+
+    setExistingImages(updatedImages);
+    setImageOrderChanged(true);
   };
 
   if (!isOpen) return null;
@@ -301,22 +362,16 @@ export function EditProductDialog({ product, categories, isOpen, onClose }: Edit
             {/* Existing Images */}
             {existingImages?.length > 0 && (
               <div>
-                <label className="block text-sm font-semibold text-amber-900 dark:text-foreground mb-2">
-                  Existing Images
+                <label className="block text-sm font-semibold text-amber-900 mb-3">
+                  Manage Product Images
                 </label>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {existingImages.map((img) => (
-                    <div key={img.id} className="relative w-full aspect-square overflow-hidden rounded-xl border border-amber-100 dark:border-border bg-amber-50/30 dark:bg-muted">
-                      <Image
-                        src={img.url}
-                        alt={img.altText || product.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 33vw, 25vw"
-                      />
-                    </div>
-                  ))}
-                </div>
+                <ImageManager
+                  images={existingImages}
+                  onReorder={handleReorderImages}
+                  onDelete={handleDeleteImage}
+                  onSetCover={handleSetCover}
+                  productName={product.name}
+                />
               </div>
             )}
 

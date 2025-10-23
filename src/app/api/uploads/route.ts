@@ -7,6 +7,15 @@ import {
   resolveS3BucketRegion,
 } from "@/lib/s3";
 
+// Configure body size limit to 10MB
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+};
+
 export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();

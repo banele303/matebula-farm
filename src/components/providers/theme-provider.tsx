@@ -25,11 +25,10 @@ const ThemeProviderContext = React.createContext<ThemeProviderState>(initialStat
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
   storageKey = "mathebula-farm-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme] = useState<Theme>("light");
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -37,14 +36,15 @@ export function ThemeProvider({
     // Always force light mode
     root.classList.remove("dark");
     root.classList.add("light");
-  }, [theme]);
+  }, []);
 
   const value = {
     theme: "light" as Theme,
-    setTheme: (theme: Theme) => {
+    setTheme: (newTheme: Theme) => {
       // Always keep light mode, ignore any theme changes
       localStorage.setItem(storageKey, "light");
-      setTheme("light");
+      // Suppress unused parameter warning
+      void newTheme;
     },
   };
 

@@ -24,8 +24,10 @@ interface Product {
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     async function fetchProducts() {
       try {
         const res = await fetch("/api/products?limit=6&featured=true");
@@ -39,6 +41,11 @@ export default function FeaturedProducts() {
     }
     fetchProducts();
   }, []);
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return null;
+  }
 
   if (loading) {
     return (
