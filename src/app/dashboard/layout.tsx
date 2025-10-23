@@ -31,7 +31,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50/30 via-white to-orange-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50/30 via-white to-orange-50/30 dark:bg-gradient-to-br dark:from-gray-950 dark:via-black dark:to-gray-900">
       <DashboardNav userName={user.name} userEmail={user.email} />
       <main className="pt-[120px] lg:pt-16 lg:pl-64">
         <div className="p-6 lg:p-8">

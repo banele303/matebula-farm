@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 type Theme = "dark" | "light" | "system";
 
@@ -28,21 +29,43 @@ export function ThemeProvider({
   storageKey = "mathebula-farm-theme",
   ...props
 }: ThemeProviderProps) {
+  const pathname = usePathname();
+  const isDashboard = pathname?.startsWith("/dashboard");
+  
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "light";
+    if (!isDashboard) return "light"; // Always light for frontend
+    return (localStorage.getItem(storageKey) as Theme) || "light";
+  });
+
   useEffect(() => {
     const root = window.document.documentElement;
 
-    // Always force light mode
-    root.classList.remove("dark");
-    root.classList.add("light");
-  }, []);
+    // Frontend pages: always light mode
+    if (!isDashboard) {
+      root.classList.remove("dark");
+      root.classList.add("light");
+      return;
+    }
+
+    // Dashboard pages: support theme switching
+    root.classList.remove("light", "dark");
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      root.classList.add(systemTheme);
+      return;
+    }
+
+    root.classList.add(theme);
+  }, [theme, isDashboard]);
 
   const value = {
-    theme: "light" as Theme,
+    theme: isDashboard ? theme : ("light" as Theme),
     setTheme: (newTheme: Theme) => {
-      // Always keep light mode, ignore any theme changes
-      localStorage.setItem(storageKey, "light");
-      // Suppress unused parameter warning
-      void newTheme;
+      if (!isDashboard) return; // Ignore theme changes on frontend
+      localStorage.setItem(storageKey, newTheme);
+      setTheme(newTheme);
     },
   };
 
